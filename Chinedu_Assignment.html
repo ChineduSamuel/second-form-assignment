@@ -1,0 +1,255 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- CSS-->
+<link rel="stylesheet" href="styles.css">	
+
+<title>Chindu-Assignment</title>
+</head>
+
+
+<body>
+<div class="infobar">MartReach Team</div>
+	
+	<!-- Display add button -->
+<button class="open-button" onclick="openForm('Add')">+ Add New Members</button>
+	<!-- Display form -->
+	<div id="form-content"></div>
+	<!-- Display fellows -->
+	<div id="content"></div> 
+
+<!--Javascript Code-->
+<script>
+	//array that contains initial info about fellows
+teams = [
+		{
+			"img" : "1.png",
+			"fullName" : "Malik",
+			"mail" : "malik@tiidelab.com",
+			"phone" : "09048940949",
+			"status" : "Member"
+		},
+		{
+			"img" : "2.png",
+			"fullName" : "Ekeso",
+			"mail" : "ekeso@Tiidelab.com",
+			"phone" : "07048478364",
+			"status" : "Member"
+		},
+		{
+			"img" : "3.png",
+			"fullName" : "Glory",
+			"mail" : "glory@tiidelab.com",
+			"phone" : "09048978797",
+			"status" : "Member"
+		},
+		{
+			"img" : "4.png",
+			"fullName" : "Chinedu",
+			"mail" : "chinedu@tiidelab.com",
+			"phone" : "09747475894",
+			"status" : "Team Lead"
+		},
+		{
+			"img" : "5.png",
+			"fullName" : "Aminu",
+			"mail" : "aminu@tiidelab.com",
+			"phone" : "06464748574",
+			"status" : "Member"
+		}
+	];
+	
+	//localStorage.setItem("fellows", JSON.stringify(fellows))
+	
+	//convert the stored data back into object
+	teams = JSON.parse(localStorage.getItem("teams"))
+	
+	//check if local storage contains data
+	if(teams == null) {
+        teams = []; //assign an empty array if no data present
+       }
+	
+	function addTeams() { 
+	
+		newTeams = {
+			"img" : document.getElementById("img").value,
+			"fullName" : document.getElementById("fullName").value,
+			"mail" : document.getElementById("mail").value,
+			"phone" : document.getElementById("phone").value,
+			"status" : document.getElementById("status").value
+		}
+		teams.push(newTeams); 
+		localStorage.setItem("teams", JSON.stringify(teams));
+		msg = "New Information Added \nClick OK to Continue";
+		displayInfo(msg); //displays the updated info
+	}
+	
+	function editTeams(teamId) { //
+		openForm("Edit", teamId);
+	}
+	
+	function editTeamDetails( teamId) { 
+			teams[teamId] = {	
+			"img" : document.getElementById("img").value,
+			"fullName" : document.getElementById("fullName").value,
+			"mail" : document.getElementById("mail").value,
+			"phone" : document.getElementById("phone").value,
+			"status" : document.getElementById("status").value
+		}
+			localStorage.setItem("teams", JSON.stringify(teams));
+			msg = "New Information Updated \nClick OK to Continue";
+			displayInfo(msg); //displays the updated info
+			
+		}
+	
+	function deleteTeam( teamId) { 
+		con = confirm(`Are you sure you want to delete ${teams[teamId].fullName}?`)
+		if (con == true) {
+			teams.splice( teamId, 1);
+			localStorage.setItem("teams", JSON.stringify(teams));
+			msg = "Teams Deleted \nClick OK to Continue";
+			displayInfo(msg); //displays the updated info
+
+		}
+	}
+	
+	function displayForm(parms, id) {
+		if(parms == "Add") { //Form to add new user
+			formContent = `<div class="form-popup" id="myForm">
+			  <form class="form-container" id="teams" onSubmit="addteams();">
+				<h3 align="center">ADD A NEW Team</h3>
+
+				<label for="img"><b>Profile Picture</b></label> <input type="text" id="img" placeholder="Enter Profile Picture URL" required>
+				<label for="fullName"><b>Full Name</b></label><input type="text" id="fullName" value="" placeholder="Enter Full name" required>
+				<label for="email"><b>Email</b></label> <input type="text" id="mail" placeholder="Enter Email" required>
+				<label for="status"><b>Status</b></label><br>
+				<select id="status" form="teams">
+					<option value="Member">Member</option>
+					<option value="Team Lead">Team Lead</option>
+				</select>
+				<br>
+				<label for="phone"><b>Phone Number</b></label><input type="text" id="phone" placeholder="Enter Phone Number" required>
+
+				<button type="submit" class="btn">Add Fellow</button>
+				<button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+			  </form></div>`;
+		}
+		else  { //Form to Edit user
+			teamId = id; //assign the fellow ID
+			formContent = `<div class="form-popup" id="myForm">
+				<form class="form-container" id="teams" onSubmit="editTeamDetails(${teamId});">
+				<h3 align="center">EDIT Team</h3>
+
+				<label for="img"><b>Profile Picture</b></label> <input type="text" id="img" value="${teams[teamId].img}" placeholder="${teams[teamId].img}">
+				<label for="fullName"><b>Full Name</b></label><input type="text" id="fullName" value="${teams[teamId].fullName}" placeholder="${teams[teamId].fullName}">
+				<label for="email"><b>Email</b></label> <input type="text" id="mail" value="${teams[teamId].mail}" placeholder="${teams[teamId].mail}" >
+				<label for="status"><b>Status</b></label><br>
+				<select id="status" form="teams">`
+					if(teams[teamId].status == "Member") { 
+						formContent += `<option value="Member" selected>Member</option><option value="Team Lead">Team Lead</option>` } else {
+						formContent += `<option value="Member">Member</option><option value="Team Lead" selected>Team Lead</option>` }
+			formContent += `</select>
+				<br>
+				<label for="phone"><b>Phone Number</b></label><input type="text" id="phone" value="${teams[teamId].phone}" placeholder="${teams[teamId].phone}">
+
+				<button type="submit" class="btn">Edit Team</button>
+				<button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+				</form></div>`
+		}
+		document.getElementById("form-content").innerHTML = formContent;
+	}
+	
+	function displayType(args) { //Select Display Type
+		displayInfo(null, args)
+	}
+	
+	function displayInfo(msg, display) { 
+		if(display == "member") { //if members only selected
+			//displays the info
+			content = "";
+			for(j=0; j < teams.length; j++) {		
+				if(teams[j].status != "Member") { 
+					continue;
+				}
+				else {
+					content += 
+					`<div class="teams">
+						<div class="teamsImg"><img src="${teams[j].img}"></div>
+						<div class="teamsContent">
+						<strong>${teams[j].fullName}</strong><br>
+						<em>${teams[j].mail}</em><br>
+						${teams[j].phone}<br>
+						${teams[j].status}<br>
+						<button onClick="editTeam(${j});" class="green">Edit User</button> &nbsp; <button onClick="deleteFellow(${j});" class="red">Delete User</button>
+					</div>
+				</div>`;
+				}
+			}
+			document.getElementById("content").innerHTML = content; //displays the Info
+			if(msg != null) { alert(msg); }
+		}
+		else if (display == "teamLead") { //if team leads selected
+			content = "";
+			//displays the info
+			for(j=0; j < teams.length; j++) {		
+				if(teams[j].status != "Team Lead") { 
+					continue;
+				}
+				else {
+					content += 
+					`<div class="teams">
+						<div class="teamsImg"><img src="${teams[j].img}"></div>
+						<div class="teamsContent">
+						<strong>${teams[j].fullName}</strong><br>
+						<em>${teams[j].mail}</em><br>
+						${teams[j].phone}<br>
+						${teams[j].status}<br>
+						<button onClick="editTeams(${j});" class="green">Edit User</button> &nbsp; <button onClick="deleteTeam(${j});" class="red">Delete User</button>
+					</div>
+				</div>`;
+				}
+		   }
+			document.getElementById("content").innerHTML = content; //displays the Info
+			if(msg != null) { alert(msg); }
+		 	
+		}
+		else { 
+			content = "";
+			//displays the info
+			for(j=0; j < teams.length; j++) {		
+				content += 
+					`<div class="teams">
+						<div class="teamsImg"><img src="${teams[j].img}"></div>
+						<div class="teamsContent">
+						<strong>${teams[j].fullName}</strong><br>
+						<em>${teams[j].mail}</em><br>
+						${teams[j].phone}<br>
+						${teams[j].status}<br>
+						<button onClick="editTeams(${j});" class="green">Edit User</button> &nbsp; <button onClick="deleteTeams(${j});" class="red">Delete User</button>
+					</div>
+				</div>`;
+				}
+				document.getElementById("content").innerHTML = content; //displays the Info
+				if(msg != null) { alert(msg); }
+		}
+	}
+	
+displayInfo(); 
+		
+/////////////////////////////////FAKUNLE MOBOLAJI JOHNSON/////////////////////////////////
+
+function openForm(formType, teamId) {
+  	displayForm(formType, teamId);
+	document.getElementById("myForm").style.display = "block";
+}
+
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+}
+	
+</script>
+		
+		
+</body>
+</html>
